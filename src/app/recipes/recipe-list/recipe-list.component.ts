@@ -4,6 +4,7 @@ import { RecipeService } from '../recipe.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {subscribeOn} from 'rxjs/internal/operators';
+import {AuthService} from '../../auth/auth.service';
 
 @Component({
   selector: 'app-recipe-list',
@@ -17,7 +18,8 @@ export class RecipeListComponent implements OnInit, OnDestroy {
   constructor(
     private recipeService: RecipeService,
     private router: Router,
-    private route: ActivatedRoute) {}
+    private route: ActivatedRoute,
+    private authService: AuthService) {}
 
   ngOnInit() {
     this.subscription = this.recipeService.recipesChanged
@@ -30,7 +32,11 @@ export class RecipeListComponent implements OnInit, OnDestroy {
   }
 
   onNewRecipe() {
-    this.router.navigate(['new'], {relativeTo: this.route});
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['new'], {relativeTo: this.route});
+    } else {
+      this.router.navigate(['../signin']);
+    }
   }
 
   ngOnDestroy() {
